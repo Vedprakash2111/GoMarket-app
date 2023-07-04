@@ -97,7 +97,8 @@
                 android:id="@+id/signInButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SIGN IN" />
+                android:text="SIGN IN"
+                android:enabled="false"/>
 
             <TextView
                 android:id="@+id/forgetPassword"

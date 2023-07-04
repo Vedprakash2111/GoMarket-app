@@ -1,17 +1,35 @@
 package com.example.e_commerce_app;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,8 +78,15 @@ public class signup_Fragment extends Fragment {
         }
     }
 
-    Button signIn;
+    Button signIn,signUpButton;
+    ImageButton closeButton;
     FrameLayout parentFrameLayout;
+    private EditText emailEditText, passwordEditText, firstNameEditText, lastNameEditText, confirmPasswordEditText;
+    private TextView errorTextView;
+    private FirebaseAuth mAuth;
+    FirebaseFirestore firebaseFirestore;
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
+    ProgressDialog pd;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,22 +95,200 @@ public class signup_Fragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_signup_, container, false);
         signIn = view.findViewById(R.id.signInButton);
         parentFrameLayout = getActivity().findViewById(R.id.register_frameLayout);
+
+        mAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        closeButton = view.findViewById(R.id.closeButton);
+        signUpButton = view.findViewById(R.id.signUpButton);
+
+        emailEditText = view.findViewById(R.id.emailEditText);
+        passwordEditText = view.findViewById(R.id.passwordEditText);
+        firstNameEditText = view.findViewById(R.id.firstNameEditText);
+        lastNameEditText = view.findViewById(R.id.lastNameEditText);
+        errorTextView = view.findViewById(R.id.errorTextView);
+        confirmPasswordEditText = view.findViewById(R.id.confirmPasswordEditText);
+        pd = new ProgressDialog(getActivity());
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                startActivity(mainIntent);
+                getActivity().finish();
+            }
+        });
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setFragment(new signin_Fragment());
             }
         });
+        firstNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInput();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        lastNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInput();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        emailEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInput();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        passwordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInput();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        confirmPasswordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkInput();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pd.setMessage("Login your account...");
+                pd.show();
+                checkEmailOrPassword();
+            }
+        });
     }
+
     private void setFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(parentFrameLayout.getId(),fragment);
         fragmentTransaction.commit();
+    }
+
+    private void checkInput(){
+        if(!TextUtils.isEmpty(firstNameEditText.getText())){
+            if(!TextUtils.isEmpty(lastNameEditText.getText())){
+                if(!TextUtils.isEmpty(emailEditText.getText())){
+                    if (!TextUtils.isEmpty(passwordEditText.getText())){
+                        if (!TextUtils.isEmpty(confirmPasswordEditText.getText())){
+                            signUpButton.setEnabled(true);
+                        }else{
+                            signUpButton.setEnabled(false);
+                        }
+                    }else {
+                        signUpButton.setEnabled(false);
+                    }
+                }else {
+                    signUpButton.setEnabled(false);
+                }
+            }else {
+                signUpButton.setEnabled(false);
+            }
+        }else {
+            signUpButton.setEnabled(false);
+        }
+    }
+    private void checkEmailOrPassword(){
+        if(emailEditText.getText().toString().matches(emailPattern)){
+            if(passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())){
+               mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(),passwordEditText.getText().toString())
+                       .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                   @Override
+                   public void onComplete(@NonNull Task<AuthResult> task) {
+                       if(task.isSuccessful()){
+                           Map<Object,String> userdata =  new HashMap<>();
+                           userdata.put("firstName", firstNameEditText.getText().toString());
+                           firebaseFirestore.collection("USERS")
+                                   .add(userdata)
+                                           .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                               @Override
+                                               public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                   if(task.isSuccessful()){
+                                                       pd.dismiss();
+                                                       Intent mainIntent = new Intent(getActivity(),MainActivity.class);
+                                                       startActivity(mainIntent);
+                                                       getActivity().finish();
+                                                   }else{
+                                                       pd.dismiss();
+                                                       String error = task.getException().getMessage();
+                                                       Toast.makeText(getActivity(), error ,Toast.LENGTH_SHORT).show();
+                                                   }
+                                               }
+                                           });
+
+                       }else {
+                           String error = task.getException().getMessage();
+                           Toast.makeText(getActivity(), error ,Toast.LENGTH_SHORT).show();
+                       }
+                   }
+               });
+            }else{
+                errorTextView.setText("Passwords do not match");
+            }
+        }else {
+            errorTextView.setText("Please check your email");
+        }
     }
 }
