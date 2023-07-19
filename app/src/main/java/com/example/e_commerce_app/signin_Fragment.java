@@ -1,5 +1,7 @@
 package com.example.e_commerce_app;
 
+import static com.example.e_commerce_app.RegisterActivity.onResetPasswordFragment;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -70,7 +72,7 @@ public class signin_Fragment extends Fragment {
     FirebaseUser currentUser;
     ProgressDialog pd;
     ImageButton closeButton;
-
+    TextView ForgetPassword;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
     Button signUp,signInButton;
     FrameLayout parentFrameLayout;
@@ -107,6 +109,7 @@ public class signin_Fragment extends Fragment {
         currentUser = mAuth.getCurrentUser();
         signInButton = view.findViewById(R.id.signInButton);
         closeButton = view.findViewById(R.id.closeButton);
+        ForgetPassword = view.findViewById(R.id.forgetPassword);
 
         emailEditText = view.findViewById(R.id.emailEditText);
         passwordEditText = view.findViewById(R.id.passwordEditText);
@@ -118,6 +121,13 @@ public class signin_Fragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ForgetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResetPasswordFragment = true;
+                setFragment(new ForgetPassword());
+            }
+        });
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +172,7 @@ public class signin_Fragment extends Fragment {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                Intent mainIntent = new Intent(getActivity(), OnBoardingActivity.class);
                 startActivity(mainIntent);
                 getActivity().finish();
             }
@@ -204,7 +214,7 @@ public class signin_Fragment extends Fragment {
                                     // Login successful
                                     pd.dismiss();
                                     Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                    Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                                    Intent mainIntent = new Intent(getActivity(),DashboardActivity.class);
                                     startActivity(mainIntent);
                                     getActivity().finish();
                                 } else {

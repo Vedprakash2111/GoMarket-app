@@ -119,7 +119,7 @@ public class signup_Fragment extends Fragment {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                Intent mainIntent = new Intent(getActivity(),OnBoardingActivity.class);
                 startActivity(mainIntent);
                 getActivity().finish();
             }
@@ -250,45 +250,50 @@ public class signup_Fragment extends Fragment {
             signUpButton.setEnabled(false);
         }
     }
-    private void checkEmailOrPassword(){
-        if(emailEditText.getText().toString().matches(emailPattern)){
-            if(passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())){
-               mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(),passwordEditText.getText().toString())
-                       .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                   @Override
-                   public void onComplete(@NonNull Task<AuthResult> task) {
-                       if(task.isSuccessful()){
-                           Map<Object,String> userdata =  new HashMap<>();
-                           userdata.put("firstName", firstNameEditText.getText().toString());
-                           firebaseFirestore.collection("USERS")
-                                   .add(userdata)
-                                           .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                               @Override
-                                               public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                   if(task.isSuccessful()){
-                                                       pd.dismiss();
-                                                       Intent mainIntent = new Intent(getActivity(),MainActivity.class);
-                                                       startActivity(mainIntent);
-                                                       getActivity().finish();
-                                                   }else{
-                                                       pd.dismiss();
-                                                       String error = task.getException().getMessage();
-                                                       Toast.makeText(getActivity(), error ,Toast.LENGTH_SHORT).show();
-                                                   }
-                                               }
-                                           });
+    private void checkEmailOrPassword() {
+        if (emailEditText.getText().toString().matches(emailPattern)) {
+            if (passwordEditText.getText().toString().equals(confirmPasswordEditText.getText().toString())) {
+                mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    String userId = mAuth.getCurrentUser().getUid();
+                                    Map<String, Object> userdata = new HashMap<>();
+                                    userdata.put("firstName", firstNameEditText.getText().toString());
+                                    userdata.put("lastName", lastNameEditText.getText().toString());
 
-                       }else {
-                           String error = task.getException().getMessage();
-                           Toast.makeText(getActivity(), error ,Toast.LENGTH_SHORT).show();
-                       }
-                   }
-               });
-            }else{
+                                    firebaseFirestore.collection("USERS")
+                                            .document(userId)
+                                            .set(userdata)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        pd.dismiss();
+                                                        Intent mainIntent = new Intent(getActivity(), DashboardActivity.class);
+                                                        startActivity(mainIntent);
+                                                        getActivity().finish();
+                                                    } else {
+                                                        pd.dismiss();
+                                                        String error = task.getException().getMessage();
+                                                        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    pd.dismiss();
+                                    String error = task.getException().getMessage();
+                                    Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            } else {
                 errorTextView.setText("Passwords do not match");
             }
-        }else {
-            errorTextView.setText("Please check your email");
+        } else {
+            errorTextView.setText("Please enter a valid email");
         }
     }
+
 }
