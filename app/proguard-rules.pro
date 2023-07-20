@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# AndroidX Lifecycle
+-keep class androidx.lifecycle.** { *; }
+-keepclassmembers class androidx.lifecycle.** { *; }

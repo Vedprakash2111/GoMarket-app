@@ -26,6 +26,8 @@
 
     <string name="description">Welcome to our app, where you can have an exceptional shopping experience with a focus on choosing the perfect products, fast delivery, and outstanding service.</string>
     <string name="gomarket">GoMarket</string>
+    <string name="button">Button</string>
+    <string name="title_activity_main2">MainActivity2</string>
 
 
 </resources>

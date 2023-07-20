@@ -25,7 +25,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -119,7 +118,7 @@ public class signup_Fragment extends Fragment {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainIntent = new Intent(getActivity(),OnBoardingActivity.class);
+                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
                 startActivity(mainIntent);
                 getActivity().finish();
             }
@@ -271,7 +270,7 @@ public class signup_Fragment extends Fragment {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
                                                         pd.dismiss();
-                                                        Intent mainIntent = new Intent(getActivity(), DashboardActivity.class);
+                                                        Intent mainIntent = new Intent(getActivity(), MainActivity.class);
                                                         startActivity(mainIntent);
                                                         getActivity().finish();
                                                     } else {
